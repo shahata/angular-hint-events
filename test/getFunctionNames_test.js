@@ -14,4 +14,10 @@ describe('getFunctionNames()', function() {
     var paramFn = getFunctionNames('one("test") / two([1,3,4])/three()');
     expect(paramFn).toEqual(['one','two','three']);
   });
+
+  it('should return an empty array for non-string params', function() {
+    expect(getFunctionNames(function () {})).toEqual([]);
+    expect(getFunctionNames([])).toEqual([]);
+    expect(getFunctionNames({})).toEqual([]);
+  });
 });
