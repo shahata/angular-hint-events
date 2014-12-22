@@ -32,4 +32,21 @@ describe('hintEvents', function() {
     expect(log['Events'].error[0]).toContain('Variable "increments" called on BUTTON ' +
       'element with id: #increment1 does not exist in that scope (Try "increment").');
   });
+
+  it('should preserve normal event handling behavior', function() {
+    var scope = $rootScope.$new();
+    var ctrl = $controller(function(){
+      scope.onclick = jasmine.createSpy('onclick');
+      scope.onmouseover = jasmine.createSpy('onmouseover');
+    });
+
+    var elm = angular.element('<button ng-click="onclick()" ng-mouseover="onmouseover()">HI</button>');
+    $compile(elm)(scope);
+    $rootScope.$digest();
+
+    elm.triggerHandler('click');
+    elm.triggerHandler('mouseover');
+    expect(scope.onclick).toHaveBeenCalled();
+    expect(scope.onmouseover).toHaveBeenCalled();
+  });
 });

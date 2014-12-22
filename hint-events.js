@@ -4,7 +4,6 @@
 * Load necessary functions from /lib into variables.
 */
 var ngEventDirectives = require('./lib/getEventDirectives')(),
-  getEventAttribute = require('./lib/getEventAttribute'),
   getFunctionNames = require('./lib/getFunctionNames'),
   formatResults = require('./lib/formatResults');
 
@@ -25,8 +24,7 @@ angular.module('ngHintEvents', [])
 
             $delegate[0].compile = function(element, attrs, transclude) {
               var angularAttrs = attrs.$attr;
-              var eventAttrName = getEventAttribute(angularAttrs);
-              var fn = $parse(attrs[eventAttrName]);
+              var linkFn = original.apply(this, arguments);
               var messages = [];
               return function ngEventHandler(scope, element, attrs) {
                 for(var attr in angularAttrs) {
@@ -42,11 +40,7 @@ angular.module('ngHintEvents', [])
                     }
                   });
                 }
-                element.on(eventAttrName.substring(2).toLowerCase(), function(event) {
-                  scope.$apply(function() {
-                    fn(scope, {$event:event});
-                  });
-                });
+                linkFn.apply(this, arguments);
                 formatResults(messages);
               };
             };
